@@ -1,0 +1,100 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+
+typedef struct Student {
+    int id;
+    char name[50];
+    int age;
+    char grade[2];
+    struct Student* next;
+    struct Student* prev;
+} Student;
+
+
+### Define the Doubly Linked List Structure and Functions
+
+The linked list will manage the student nodes.
+
+c
+typedef struct {
+    Student* head;
+} StudentManagementSystem;
+
+StudentManagementSystem* create_system() {
+    StudentManagementSystem* system = (StudentManagementSystem*)malloc(sizeof(StudentManagementSystem));
+    system->head = NULL;
+    return system;
+}
+
+Student* create_student(int id, const char* name, int age, const char* grade) {
+    Student* new_student = (Student*)malloc(sizeof(Student));
+    new_student->id = id;
+    strcpy(new_student->name, name);
+    new_student->age = age;
+    strcpy(new_student->grade, grade);
+    new_student->next = NULL;
+    new_student->prev = NULL;
+    return new_student;
+}
+
+void add_student(StudentManagementSystem* system, int id, const char* name, int age, const char* grade) {
+    Student* new_student = create_student(id, name, age, grade);
+    if (system->head == NULL) {
+        system->head = new_student;
+    } else {
+        Student* current = system->head;
+        while (current->next != NULL) {
+            current = current->next;
+        }
+        current->next = new_student;
+        new_student->prev = current;
+    }
+}
+
+void delete_student(StudentManagementSystem* system, int id) {
+    Student* current = system->head;
+    while (current != NULL) {
+        if (current->id == id) {
+            if (current->prev != NULL) {
+                current->prev->next = current->next;
+            }
+            if (current->next != NULL) {
+                current->next->prev = current->prev;
+            }
+            if (current == system->head) {
+                system->head = current->next;
+            }
+            free(current);
+            return;
+        }
+        current = current->next;
+    }
+}
+
+void display_students(StudentManagementSystem* system) {
+    Student* current = system->head;
+    while (current != NULL) {
+        printf("ID: %d, Name: %s, Age: %d, Grade: %s\n", current->id, current->name, current->age, current->grade);
+        current = current->next;
+    }
+}
+
+int main() {
+    StudentManagementSystem* system = create_system();
+    
+    add_student(system, 1, "Alice", 20, "A");
+    add_student(system, 2, "Bob", 21, "B");
+    add_student(system, 3, "Charlie", 22, "C");
+    
+    printf("Student List:\n");
+    display_students(system);
+    
+    printf("\nDeleting student with ID 2:\n");
+    delete_student(system, 2);
+    
+    printf("\nUpdated Student List:\n");
+    display_students(system);
+    
+    return 0;
+}
